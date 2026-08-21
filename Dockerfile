@@ -9,8 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
     g++ \
-    curl \
-    tini
+    curl
 
 COPY requirements.txt .
 RUN grep -v pywin32 requirements.txt > requirements_filtered.txt && \
@@ -25,7 +24,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    tini \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
@@ -33,9 +31,10 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 WORKDIR /app
 
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 COPY . .
 
 EXPOSE 8000
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD python precheck.py && python bot.py --test-mode --no-grafana
+ENTRYPOINT ["./entrypoint.sh"]
