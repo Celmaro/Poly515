@@ -1288,6 +1288,8 @@ class IntegratedBTCStrategy(Strategy):
             logger.info("Grafana metrics started on port 8000")
         except Exception as e:
             logger.error(f"Failed to start Grafana: {e}")
+            import os
+            os._exit(1)
 
     def on_stop(self):
         logger.info("Integrated BTC strategy stopped")

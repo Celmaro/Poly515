@@ -359,7 +359,7 @@ class GrafanaMetricsExporter:
             MetricsHandler.exporter = self
             
             # Create and start custom HTTP server
-            self._server = HTTPServer(('0.0.0.0', self.port), MetricsHandler)
+            self._server = HTTPServer(('127.0.0.1', self.port), MetricsHandler)
             self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
             self._thread.start()
             
