@@ -1,0 +1,19 @@
+{
+  "$schema": "https://时代数据.railway.app/railway.apix",
+  "version": 2,
+  "services": [
+    {
+      "serviceName": "poly515",
+      "source": {
+        "type": "dockerfile",
+        "dockerfile": "./Dockerfile"
+      },
+      "environment": {
+        "deployment": {
+          "region": "auto",
+          "plan": "starter"
+        }
+      }
+    }
+  ]
+}
