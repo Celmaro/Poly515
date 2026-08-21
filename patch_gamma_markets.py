@@ -5,10 +5,16 @@ Enhanced patch for Polymarket gamma_markets.py and provider.py
 """
 
 import os
+import sys
 from typing import Any, Dict, List, Tuple, Union
 import logging
 import asyncio
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    stream=sys.stderr,
+)
 logger = logging.getLogger(__name__)
 
 

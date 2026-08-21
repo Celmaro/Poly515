@@ -10,7 +10,10 @@ from dataclasses import dataclass
 from typing import List, Optional, Dict
 import random
 
-# Add project to path
+print("=" * 60, flush=True)
+print("Poly515 Trading Bot — STARTING", flush=True)
+print("=" * 60, flush=True)
+
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
@@ -21,11 +24,11 @@ try:
     if patch_applied:
         verify_patch()
     else:
-        print("ERROR: Failed to apply gamma_market patch")
+        print("ERROR: Failed to apply gamma_market patch", flush=True)
         sys.exit(1)
 except ImportError as e:
-    print(f"ERROR: Could not import patch module: {e}")
-    print("Make sure patch_gamma_markets.py is in the same directory")
+    print(f"ERROR: Could not import patch module: {e}", flush=True)
+    print("Make sure patch_gamma_markets.py is in the same directory", flush=True)
     sys.exit(1)
 
 # Now import Nautilus
