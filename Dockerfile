@@ -38,4 +38,4 @@ COPY . .
 EXPOSE 8000
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["python", "bot.py", "--test-mode"]
+CMD ["python", "bot.py", "--test-mode", "--no-grafana"]
