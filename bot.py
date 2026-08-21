@@ -31,54 +31,85 @@ except ImportError as e:
     print("Make sure patch_gamma_markets.py is in the same directory", flush=True)
     sys.exit(1)
 
-# Now import Nautilus
-from nautilus_trader.config import (
-    InstrumentProviderConfig,
-    LiveDataEngineConfig,
-    LiveExecEngineConfig,
-    LiveRiskEngineConfig,
-    LoggingConfig,
-    TradingNodeConfig,
-)
-from nautilus_trader.live.node import TradingNode
-from nautilus_trader.adapters.polymarket import POLYMARKET
-from nautilus_trader.adapters.polymarket import (
-    PolymarketDataClientConfig,
-    PolymarketExecClientConfig,
-)
-from nautilus_trader.adapters.polymarket.factories import (
-    PolymarketLiveDataClientFactory,
-    PolymarketLiveExecClientFactory,
-)
-from nautilus_trader.trading.strategy import Strategy
-from nautilus_trader.model.identifiers import InstrumentId, ClientOrderId
-from nautilus_trader.model.enums import OrderSide, TimeInForce
-from nautilus_trader.model.objects import Quantity
-from nautilus_trader.model.data import QuoteTick
+try:
+    from nautilus_trader.config import (
+        InstrumentProviderConfig,
+        LiveDataEngineConfig,
+        LiveExecEngineConfig,
+        LiveRiskEngineConfig,
+        LoggingConfig,
+        TradingNodeConfig,
+    )
+    from nautilus_trader.live.node import TradingNode
+    from nautilus_trader.adapters.polymarket import POLYMARKET
+    from nautilus_trader.adapters.polymarket import (
+        PolymarketDataClientConfig,
+        PolymarketExecClientConfig,
+    )
+    from nautilus_trader.adapters.polymarket.factories import (
+        PolymarketLiveDataClientFactory,
+        PolymarketLiveExecClientFactory,
+    )
+    from nautilus_trader.trading.strategy import Strategy
+    from nautilus_trader.model.identifiers import InstrumentId, ClientOrderId
+    from nautilus_trader.model.enums import OrderSide, TimeInForce
+    from nautilus_trader.model.objects import Quantity
+    from nautilus_trader.model.data import QuoteTick
+except Exception as e:
+    import traceback
+    sys.stderr.write(f"ERROR: Failed to import nautilus_trader: {e}\n")
+    sys.stderr.flush()
+    traceback.print_exc()
+    sys.exit(1)
 
-from dotenv import load_dotenv
-from loguru import logger
-import redis
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception as e:
+    sys.stderr.write(f"WARNING: dotenv unavailable: {e}\n")
+    sys.stderr.flush()
 
-# Import our phases
-from core.strategy_brain.signal_processors.spike_detector import SpikeDetectionProcessor
-from core.strategy_brain.signal_processors.sentiment_processor import SentimentProcessor
-from core.strategy_brain.signal_processors.divergence_processor import PriceDivergenceProcessor
-from core.strategy_brain.signal_processors.orderbook_processor import OrderBookImbalanceProcessor
-from core.strategy_brain.signal_processors.tick_velocity_processor import TickVelocityProcessor
-from core.strategy_brain.signal_processors.deribit_pcr_processor import DeribitPCRProcessor
-from core.strategy_brain.fusion_engine.signal_fusion import get_fusion_engine
-from execution.risk_engine import get_risk_engine
-from monitoring.performance_tracker import get_performance_tracker
-from monitoring.grafana_exporter import get_grafana_exporter
-from feedback.learning_engine import get_learning_engine
-load_dotenv()
-from patch_market_orders import apply_market_order_patch
-patch_applied = apply_market_order_patch()
-if patch_applied:
-    logger.info("Market order patch applied successfully")
-else:
-    logger.warning("Market order patch failed - orders may be rejected")
+try:
+    from loguru import logger
+except Exception as e:
+    import logging
+    logger = logging.getLogger(__name__)
+    sys.stderr.write(f"WARNING: loguru unavailable, using stdlib logging: {e}\n")
+    sys.stderr.flush()
+
+try:
+    import redis
+except Exception as e:
+    sys.stderr.write(f"ERROR: Failed to import redis: {e}\n")
+    sys.stderr.flush()
+    sys.exit(1)
+
+try:
+    from core.strategy_brain.signal_processors.spike_detector import SpikeDetectionProcessor
+    from core.strategy_brain.signal_processors.sentiment_processor import SentimentProcessor
+    from core.strategy_brain.signal_processors.divergence_processor import PriceDivergenceProcessor
+    from core.strategy_brain.signal_processors.orderbook_processor import OrderBookImbalanceProcessor
+    from core.strategy_brain.signal_processors.tick_velocity_processor import TickVelocityProcessor
+    from core.strategy_brain.signal_processors.deribit_pcr_processor import DeribitPCRProcessor
+    from core.strategy_brain.fusion_engine.signal_fusion import get_fusion_engine
+    from execution.risk_engine import get_risk_engine
+    from monitoring.performance_tracker import get_performance_tracker
+    from monitoring.grafana_exporter import get_grafana_exporter
+    from feedback.learning_engine import get_learning_engine
+except Exception as e:
+    import traceback
+    sys.stderr.write(f"ERROR: Failed to import core modules: {e}\n")
+    sys.stderr.flush()
+    traceback.print_exc()
+    sys.exit(1)
+
+try:
+    from patch_market_orders import apply_market_order_patch
+    if not apply_market_order_patch():
+        logger.warning("Market order patch failed - orders may be rejected")
+except Exception as e:
+    sys.stderr.write(f"WARNING: Market order patch failed: {e}\n")
+    sys.stderr.flush()
 
 
 # =============================================================================
